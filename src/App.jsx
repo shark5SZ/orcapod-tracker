@@ -8,7 +8,7 @@ function App() {
     { id: 3, date: "2025-09-22" },
   ]);
 
-  // Example data: who viewed what
+  // Example data who viewed what
   const [views, setViews] = useState({
     Alice: { "2025-09-20": true, "2025-09-21": false, "2025-09-22": true },
     Bob:   { "2025-09-20": true, "2025-09-21": true,  "2025-09-22": false },
