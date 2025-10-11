@@ -15,6 +15,8 @@ function App() {
   const [newViewer, setNewViewer] = useState("");
   const [newStatusDate, setNewStatusDate] = useState("");
 
+  const [searchQuery, setSearchQuery] = useState("");
+
   // 🟣 Save data anytime state changes
   useEffect(() => {
     localStorage.setItem("viewers", JSON.stringify(viewers));
@@ -115,6 +117,10 @@ function App() {
     delete updatedViews[viewerName];
     setViews(updatedViews);
   };
+
+  const filteredViewers = sortedViewers.filter(viewer =>
+    viewer.toLowerCase().includes(searchQuery.toLowerCase())
+  );
     
   return (
     <>
@@ -135,7 +141,7 @@ function App() {
             </tr>
           </thead>
           <tbody>
-            {sortedViewers.map((viewer, index) => (
+            {filteredViewers.map((viewer, index) => (
               <tr key={viewer}>
                 <td className="border px-4 py-2 text-center">{index + 1}</td>
                 <td className="border px-4 py-2 font-medium">
@@ -165,39 +171,49 @@ function App() {
       </div>
 
       <div className="flex gap-4">
-      {/* --- Input to add a viewer --- */}
-      <div className="mt-4 flex gap-2">
-        <input
-          type="text"
-          value={newViewer}
-          onChange={e => setNewViewer(e.target.value)}
-          placeholder="Enter new viewer"
-          className="border p-2 rounded"
-        />
-        <button
-          onClick={handleAddViewer}
-          className="bg-blue-500 text-white px-4 py-2 rounded"
-        >
-          Add Viewer
-        </button>
-      </div>
+        {/* --- Input to add a viewer --- */}
+        <div className="mt-4 flex gap-2">
+          <input
+            type="text"
+            value={newViewer}
+            onChange={e => setNewViewer(e.target.value)}
+            placeholder="Enter new viewer"
+            className="border p-2 rounded"
+          />
+          <button
+            onClick={handleAddViewer}
+            className="bg-blue-500 text-white px-4 py-2 rounded"
+          >
+            Add Viewer
+          </button>
+        </div>
 
-       {/* --- Add Status Form --- */}
-      <div className="mt-4 flex gap-2">
-        <input
-          type="text"
-          value={newStatusDate}
-          onChange={e => setNewStatusDate(e.target.value)}
-          placeholder="Enter status (e.g. 2025-09-23)"
-          className="border p-2 rounded"
-        />
-        <button
-          onClick={handleAddStatus}
-          className="bg-green-500 text-white px-4 py-2 rounded"
-        >
-          Add Status
-        </button>
-      </div>
+        {/* --- Add Status Form --- */}
+        <div className="mt-4 flex gap-2">
+          <input
+            type="text"
+            value={newStatusDate}
+            onChange={e => setNewStatusDate(e.target.value)}
+            placeholder="Enter status (e.g. 2025-09-23)"
+            className="border p-2 rounded"
+          />
+          <button
+            onClick={handleAddStatus}
+            className="bg-green-500 text-white px-4 py-2 rounded"
+          >
+            Add Status
+          </button>
+        </div>
+
+        <div className="mt-4 mb-2">
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search viewer..."
+            className="border p-2 rounded w-full sm:w-64"
+          />
+        </div>
       </div>
     </>
   )
