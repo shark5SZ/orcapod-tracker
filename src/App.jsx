@@ -1,26 +1,40 @@
-import { useState } from "react";
+import { useState, useEffect  } from "react";
 
 function App() {
-  const [viewers, setViewers] = useState(["Alice", "Bob", "Charlie"]);
-  const [statuses, setStatuses] = useState([
-    { id: 1, date: "2025-09-20" },
-    { id: 2, date: "2025-09-21" },
-    { id: 3, date: "2025-09-22" },
-  ]);
+  // Load initial data directly from localStorage
+  const [viewers, setViewers] = useState(() =>
+    JSON.parse(localStorage.getItem("viewers")) || []
+  );
+  const [statuses, setStatuses] = useState(() =>
+    JSON.parse(localStorage.getItem("statuses")) || []
+  );
+  const [views, setViews] = useState(() =>
+    JSON.parse(localStorage.getItem("views")) || {}
+  );
 
-  // Example data who viewed what
-  const [views, setViews] = useState({
-    Alice: { "2025-09-20": true, "2025-09-21": false, "2025-09-22": true },
-    Bob:   { "2025-09-20": true, "2025-09-21": true,  "2025-09-22": false },
-    Charlie:{ "2025-09-20": false,"2025-09-21": true, "2025-09-22": true },
-  });
+  const [newViewer, setNewViewer] = useState("");
+  const [newStatusDate, setNewStatusDate] = useState("");
 
-  const [newViewer, setNewViewer] = useState(""); // input state
-  const [newStatusDate, setNewStatusDate] = useState(""); 
+  // 🟣 Save data anytime state changes
+  useEffect(() => {
+    localStorage.setItem("viewers", JSON.stringify(viewers));
+  }, [viewers]);
+
+  useEffect(() => {
+    localStorage.setItem("statuses", JSON.stringify(statuses));
+  }, [statuses]);
+
+  useEffect(() => {
+    localStorage.setItem("views", JSON.stringify(views));
+  }, [views]);
+
 
   // Function to add viewer
   const handleAddViewer = () => {
     if (!newViewer.trim()) return; // avoid empty names
+
+    const nameExists = viewers.some( (v) => v.toLowerCase() === newViewer.toLowerCase());
+    if (nameExists) return alert("Viewer already exists");
 
     // 1. Add to viewers list
     setViewers([...viewers, newViewer]);
@@ -34,7 +48,6 @@ function App() {
     // Clear input
     setNewViewer("");
   };
-
 
   // Add status
   const handleAddStatus = () => {
@@ -73,29 +86,69 @@ function App() {
     }));
   };
 
+  const getStatusViewCount = (date) => {
+    return viewers.reduce((count, viewer) => {
+      return views[viewer]?.[date] ? count + 1 : count;
+    }, 0);
+  };
 
+  const getViewerViewCount = (viewer) => {
+    const viewerData = views[viewer] || {};
+    return Object.values(viewerData).filter(v => v === true).length;
+  };
+
+  // Sort viewers by view count (descending)
+  const sortedViewers = [...viewers].sort((a, b) => {
+    return getViewerViewCount(b) - getViewerViewCount(a);
+  });
+
+  const handleDeleteViewer = (viewerName) => {
+    // Confirm deletion (optional)
+    if (!confirm(`Delete viewer "${viewerName}"?`)) return;
+
+    // 1. Remove viewer from the list
+    const updatedViewers = viewers.filter(v => v !== viewerName);
+    setViewers(updatedViewers);
+
+    // 2. Remove viewer’s views data
+    const updatedViews = { ...views };
+    delete updatedViews[viewerName];
+    setViews(updatedViews);
+  };
     
   return (
     <>
-      <h1>Orcapod Tracker</h1>
-      <p>Track and analyse your social reach, one status at a time</p>
+      <h1 className="text-center text-blue-400 mt-4 text-4xl">Orcapod Tracker</h1>
+      <p className="text-center mb-4">Track and analyse your social reach, one status at a time</p>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto  overflow-y-auto max-h-110">
         <table className="min-w-full border border-gray-300">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-100 sticky top-0 z-10">
             <tr>
+              <th className="border px-4 py-2">#</th>
               <th className="border px-4 py-2">Viewer</th>
               {statuses.map(status => (
                 <th key={status.id} className="border px-4 py-2">
-                  {status.date}
+                  {status.date}({getStatusViewCount(status.date)})
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
-            {viewers.map(viewer => (
+            {sortedViewers.map((viewer, index) => (
               <tr key={viewer}>
-                <td className="border px-4 py-2 font-medium">{viewer}</td>
+                <td className="border px-4 py-2 text-center">{index + 1}</td>
+                <td className="border px-4 py-2 font-medium">
+                  {viewer}
+                  ({getViewerViewCount(viewer)}) 
+                  <button
+                    onClick={() => handleDeleteViewer(viewer)}
+                    className="ml-2 text-red-500 hover:text-red-700 text-sm"
+                  >
+                    ✕
+                  </button>
+                </td>
+                
                 {statuses.map(status => (
                   <td key={status.id} className="border px-4 py-2 text-center">
                     <input
