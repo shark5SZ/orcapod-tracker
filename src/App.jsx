@@ -173,7 +173,7 @@ function App() {
           <thead className="bg-gray-100 sticky top-0 z-10">
             <tr>
               <th className="border px-2 py-2">#</th>
-              <th className="border px-2 py-2">Viewers</th>
+              <th className="border px-2 py-2 text-white bg-gray-900 sticky left-0 z-10">Viewers</th>
               {statuses.map(status => (
                 <th key={status.id} className="border px-2 py-2">
                   {editingStatusId === status.id ? (
@@ -217,7 +217,7 @@ function App() {
             {filteredViewers.map((viewer, index) => (
               <tr key={viewer}>
                 <td className="border px-2 py-2 text-center">{index + 1}</td>
-                <td className="border px-2 py-2 font-medium">
+                <td className="border px-2 py-2 font-medium text-white sticky left-0 z-9 bg-gray-900">
                   {viewer}
                   ({getViewerViewCount(viewer)}) 
                   <button
