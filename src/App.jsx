@@ -17,6 +17,9 @@ function App() {
 
   const [searchQuery, setSearchQuery] = useState("");
 
+  const [editingStatusId, setEditingStatusId] = useState(null);
+  const [editedStatusName, setEditedStatusName] = useState("");
+
   // 🟣 Save data anytime state changes
   useEffect(() => {
     localStorage.setItem("viewers", JSON.stringify(viewers));
@@ -121,6 +124,44 @@ function App() {
   const filteredViewers = sortedViewers.filter(viewer =>
     viewer.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleEditStatus = (status) => {
+    setEditingStatusId(status.id);
+    setEditedStatusName(status.date);
+  };
+
+  const handleSaveStatus = (statusId) => {
+    if (!editedStatusName.trim()) return alert("Status name cannot be empty");
+
+    const oldStatus = statuses.find((s) => s.id === statusId);
+    const oldDate = oldStatus.date;
+    const newDate = editedStatusName.trim();
+
+    // 1. Update statuses array
+    const updatedStatuses = statuses.map((s) =>
+      s.id === statusId ? { ...s, date: newDate } : s
+    );
+    setStatuses(updatedStatuses);
+
+    // 2. Update views (rename the key)
+    const updatedViews = {};
+      for (const [viewer, viewData] of Object.entries(views)) {
+        const newViewData = { ...viewData };
+        newViewData[newDate] = newViewData[oldDate];
+        delete newViewData[oldDate];
+        updatedViews[viewer] = newViewData;
+      }
+    setViews(updatedViews);
+
+    // 3. Exit edit mode
+    setEditingStatusId(null);
+    setEditedStatusName("");
+  };
+
+  const handleCancelEdit = () => {
+    setEditingStatusId(null);
+    setEditedStatusName("");
+  };
     
   return (
     <>
@@ -131,11 +172,43 @@ function App() {
         <table className="min-w-full border border-gray-300">
           <thead className="bg-gray-100 sticky top-0 z-10">
             <tr>
-              <th className="border px-4 py-2">#</th>
-              <th className="border px-4 py-2">Viewer</th>
+              <th className="border px-2 py-2">#</th>
+              <th className="border px-2 py-2">Viewers</th>
               {statuses.map(status => (
-                <th key={status.id} className="border px-4 py-2">
-                  {status.date}({getStatusViewCount(status.date)})
+                <th key={status.id} className="border px-2 py-2">
+                  {editingStatusId === status.id ? (
+                    <div className="flex items-center gap-1">
+                      <input
+                        type="text"
+                        value={editedStatusName}
+                        onChange={(e) => setEditedStatusName(e.target.value)}
+                        className="border p-1 rounded w-20"
+                      />
+                      <button
+                        onClick={() => handleSaveStatus(status.id)}
+                        className="text-green-500 text-sm"
+                      >
+                        💾
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="text-gray-400 hover:text-gray-600 text-sm"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1 justify-center">
+                      <span>{status.date}({getStatusViewCount(status.date)})</span>
+                      <button
+                        onClick={() => handleEditStatus(status)}
+                        className="text-blue-500 text-xs ml-1"
+                      >
+                        ✎
+                      </button>
+                    </div>
+                  )}
+                  
                 </th>
               ))}
             </tr>
@@ -143,8 +216,8 @@ function App() {
           <tbody>
             {filteredViewers.map((viewer, index) => (
               <tr key={viewer}>
-                <td className="border px-4 py-2 text-center">{index + 1}</td>
-                <td className="border px-4 py-2 font-medium">
+                <td className="border px-2 py-2 text-center">{index + 1}</td>
+                <td className="border px-2 py-2 font-medium">
                   {viewer}
                   ({getViewerViewCount(viewer)}) 
                   <button
