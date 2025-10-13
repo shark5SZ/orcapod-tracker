@@ -164,11 +164,11 @@ function App() {
   };
     
   return (
-    <>
+    <div className="min-h-screen w-full px-14">
       <h1 className="text-center text-blue-400 mt-4 text-4xl">Orcapod Tracker</h1>
       <p className="text-center mb-4">Track and analyse your social reach, one status at a time</p>
 
-      <div className="overflow-x-auto  overflow-y-auto max-h-110">
+      <div className="overflow-x-auto text-xs overflow-y-auto max-h-110">
         <table className="min-w-full border border-gray-300">
           <thead className="bg-gray-100 sticky top-0 z-10">
             <tr>
@@ -243,7 +243,7 @@ function App() {
         </table>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex items-center justify-center gap-4">
         {/* --- Input to add a viewer --- */}
         <div className="mt-4 flex gap-2">
           <input
@@ -288,7 +288,7 @@ function App() {
           />
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
