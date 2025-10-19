@@ -1,16 +1,8 @@
 import { useState, useEffect  } from "react";
+import { useOrcapodData } from "./hooks/useOrcapodData";
 
 function App() {
-  // Load initial data directly from localStorage
-  const [viewers, setViewers] = useState(() =>
-    JSON.parse(localStorage.getItem("viewers")) || []
-  );
-  const [statuses, setStatuses] = useState(() =>
-    JSON.parse(localStorage.getItem("statuses")) || []
-  );
-  const [views, setViews] = useState(() =>
-    JSON.parse(localStorage.getItem("views")) || {}
-  );
+  const { viewers, setViewers, statuses, setStatuses, views, setViews } = useOrcapodData();
 
   const [newViewer, setNewViewer] = useState("");
   const [newStatusDate, setNewStatusDate] = useState("");
@@ -19,20 +11,6 @@ function App() {
 
   const [editingStatusId, setEditingStatusId] = useState(null);
   const [editedStatusName, setEditedStatusName] = useState("");
-
-  // 🟣 Save data anytime state changes
-  useEffect(() => {
-    localStorage.setItem("viewers", JSON.stringify(viewers));
-  }, [viewers]);
-
-  useEffect(() => {
-    localStorage.setItem("statuses", JSON.stringify(statuses));
-  }, [statuses]);
-
-  useEffect(() => {
-    localStorage.setItem("views", JSON.stringify(views));
-  }, [views]);
-
 
   // Function to add viewer
   const handleAddViewer = () => {
