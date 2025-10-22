@@ -146,79 +146,99 @@ function App() {
       <h1 className="text-center text-blue-400 mt-4 text-4xl">Orcapod Tracker</h1>
       <p className="text-center mb-4">Track and analyse your social reach, one status at a time</p>
 
-      <div className="overflow-x-auto text-xs overflow-y-auto max-h-110">
-        <table className="min-w-full border border-gray-300">
-          <thead className="bg-gray-100 sticky top-0 z-10">
-            <tr>
-              <th className="border px-2 py-2">#</th>
-              <th className="border px-2 py-2 text-white bg-gray-900 sticky left-0 z-10">Viewers</th>
-              {statuses.map(status => (
-                <th key={status.id} className="border px-2 py-2">
-                  {editingStatusId === status.id ? (
-                    <div className="flex items-center gap-1">
-                      <input
-                        type="text"
-                        value={editedStatusName}
-                        onChange={(e) => setEditedStatusName(e.target.value)}
-                        className="border p-1 rounded w-20"
-                      />
-                      <button
-                        onClick={() => handleSaveStatus(status.id)}
-                        className="text-green-500 text-sm"
-                      >
-                        💾
-                      </button>
-                      <button
-                        onClick={handleCancelEdit}
-                        className="text-gray-400 hover:text-gray-600 text-sm"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-1 justify-center">
-                      <span>{status.date}({getStatusViewCount(status.date)})</span>
-                      <button
-                        onClick={() => handleEditStatus(status)}
-                        className="text-blue-500 text-xs ml-1"
-                      >
-                        ✎
-                      </button>
-                    </div>
-                  )}
-                  
-                </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {filteredViewers.map((viewer, index) => (
-              <tr key={viewer}>
-                <td className="border px-2 py-2 text-center">{index + 1}</td>
-                <td className="border px-2 py-2 font-medium text-white sticky left-0 z-9 bg-gray-900">
-                  {viewer}
-                  ({getViewerViewCount(viewer)}) 
-                  <button
-                    onClick={() => handleDeleteViewer(viewer)}
-                    className="ml-2 text-red-500 hover:text-red-700 text-sm"
-                  >
-                    ✕
-                  </button>
-                </td>
-                
-                {statuses.map(status => (
-                  <td key={status.id} className="border px-4 py-2 text-center">
-                    <input
-                      type="checkbox"
-                      checked={views[viewer]?.[status.date] || false}
-                      onChange={() => toggleView(viewer, status.date)}
-                    />
-                  </td>
-                ))}
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="overflow-x-auto">
+          <div className="max-h-110 overflow-y-auto">
+            <table className="min-w-full">
+              <thead className="bg-gray-900 text-white sticky top-0 z-20">
+                <tr>
+                  <th className="px-6 py-4 text-left text-sm bg-gray-900 font-semibold sticky left-0 z-30">#</th>
+                  <th className="px-6 py-4 text-left text-sm bg-gray-900 font-semibold sticky left-12 z-30">Viewers</th>
+                  {statuses.map(status => (
+                    <th key={status.id} className="px-2 py-2 text-center z-10 text-sm font-semibold whitespace-nowrap">
+                      {editingStatusId === status.id ? (
+                        <div className="flex items-center gap-1">
+                          <input
+                            type="text"
+                            value={editedStatusName}
+                            onChange={(e) => setEditedStatusName(e.target.value)}
+                            className="border p-1 rounded w-20"
+                          />
+                          <button
+                            onClick={() => handleSaveStatus(status.id)}
+                            className="text-green-500 text-sm"
+                          >
+                            💾
+                          </button>
+                          <button
+                            onClick={handleCancelEdit}
+                            className="text-gray-400 hover:text-gray-600 text-sm"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1 justify-center">
+                          <span>{status.date}</span>
+                          <span className="text-xs bg-white/20 px-2 py-1 rounded-full">
+                            {getStatusViewCount(status.date)}
+                          </span> 
+                          <button
+                            onClick={() => handleEditStatus(status)}
+                            className="text-blue-500 text-xs ml-1"
+                          >
+                            ✎
+                          </button>
+                        </div>
+                      )}
+                      
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200">
+                {filteredViewers.length === 0 ? (
+                      <tr>
+                        <td colSpan={statuses.length + 2} className="px-6 py-8 text-center text-gray-500">
+                          No viewers found matching "{searchQuery}"
+                        </td>
+                      </tr>
+                    ) : (filteredViewers.map((viewer, index) => (
+                          <tr key={viewer}>
+                            <td className="px-6 py-4 text-gray-500 text-sm bg-white sticky left-0 z-10">{index + 1}</td>
+                            <td className="px-6 py-4 font-medium text-gray-900 sticky left-12 z-10 bg-white">
+                              <div className="flex items-center justify-between gap-4">
+                                <div className="flex items-center gap-2">
+                                  <span>{viewer}</span>
+                                  <span className="bg-blue-100 text-xs text-blue-700 px-2 py-1 rounded-full font-semibold">
+                                    {getViewerViewCount(viewer)}
+                                  </span>
+                                </div>
+                                <button
+                                  onClick={() => handleDeleteViewer(viewer)}
+                                  className="ml-2 text-red-500 hover:text-red-700 text-sm"
+                                >
+                                  ✕
+                                </button>
+                              </div>
+                            </td>
+                            
+                            {statuses.map(status => (
+                              <td key={status.id} className="px-6 py-4 text-center">
+                                <input
+                                  type="checkbox"
+                                  checked={views[viewer]?.[status.date] || false}
+                                  onChange={() => toggleView(viewer, status.date)}
+                                />
+                              </td>
+                            ))}
+                          </tr>
+                        )))
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <div className="flex items-center justify-center gap-4">
